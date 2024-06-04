@@ -1,3 +1,5 @@
+// lib/core/routes/app_router.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -53,6 +55,9 @@ abstract class AppRouter {
         path: '${Routers.conversation}/:chatId',
         builder: (context, state) {
           final chatId = state.pathParameters['chatId']!;
+          final otherUserName =
+              state.extra as String? ?? 'Unknown User'; // تعيين قيمة افتراضية
+
           return MultiBlocProvider(
             providers: [
               BlocProvider.value(
@@ -60,7 +65,10 @@ abstract class AppRouter {
               BlocProvider(
                   create: (context) => ChatCubit()..loadMessages(chatId)),
             ],
-            child: ConversationPage(chatId: chatId),
+            child: ConversationPage(
+              chatId: chatId,
+              otherUserName: otherUserName,
+            ),
           );
         },
       ),

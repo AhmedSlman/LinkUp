@@ -14,6 +14,7 @@ class AllChatsPage extends StatelessWidget {
     final currentUserId = context.read<AuthCubit>().state is SignInSuccessState
         ? (context.read<AuthCubit>().state as SignInSuccessState).user.uid
         : null;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Chat List'),
@@ -28,7 +29,10 @@ class AllChatsPage extends StatelessWidget {
         ],
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('chats').snapshots(),
+        stream: FirebaseFirestore.instance
+            .collection('chats')
+            .where('users', arrayContains: currentUserId)
+            .snapshots(),
         builder: (ctx, AsyncSnapshot<QuerySnapshot> chatSnapshot) {
           if (chatSnapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -40,7 +44,6 @@ class AllChatsPage extends StatelessWidget {
             itemCount: chatDocs.length,
             itemBuilder: (ctx, index) {
               final chatDoc = chatDocs[index];
-              final recipientName = chatDoc['recipientName']?.toString();
               final users =
                   List<String>.from(chatDoc['users'] as List).cast<String>();
               // Get the other user's name based on current user ID
@@ -51,16 +54,48 @@ class AllChatsPage extends StatelessWidget {
                     .collection('users')
                     .doc(otherUserId)
                     .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    final otherUserData = snapshot.data!;
+                builder: (context, userSnapshot) {
+                  if (userSnapshot.hasData) {
+                    final otherUserData = userSnapshot.data!;
                     final otherUserName =
                         otherUserData['first_name']?.toString();
-                    return ListTile(
-                      title: Text(otherUserName ?? 'Loading...'),
-                      onTap: () {
-                        final chatId = chatDoc.id;
-                        context.go('${Routers.conversation}/$chatId');
+
+                    return StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('chats')
+                          .doc(chatDoc.id)
+                          .collection('messages')
+                          .orderBy('timestamp', descending: true)
+                          .limit(1)
+                          .snapshots(),
+                      builder: (context, messageSnapshot) {
+                        if (messageSnapshot.hasData &&
+                            messageSnapshot.data!.docs.isNotEmpty) {
+                          final latestMessageDoc =
+                              messageSnapshot.data!.docs.first;
+                          final latestMessageText =
+                              latestMessageDoc['text']?.toString();
+
+                          return ListTile(
+                            title: Text(otherUserName ?? 'Loading...'),
+                            subtitle: Text(latestMessageText ?? ''),
+                            onTap: () {
+                              final chatId = chatDoc.id;
+                              context.go('${Routers.conversation}/$chatId',
+                                  extra: otherUserName);
+                            },
+                          );
+                        } else {
+                          return ListTile(
+                            title: Text(otherUserName ?? 'Loading...'),
+                            subtitle: const Text('No messages yet'),
+                            onTap: () {
+                              final chatId = chatDoc.id;
+                              context.go('${Routers.conversation}/$chatId',
+                                  extra: otherUserName);
+                            },
+                          );
+                        }
                       },
                     );
                   } else {

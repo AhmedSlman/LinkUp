@@ -62,29 +62,51 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
-  void createNewChat(String userId) async {
+  Future<void> createNewChat(String userId) async {
     emit(ChatLoading());
     try {
+      // Get current user's ID
+      final currentUserUid = _auth.currentUser!.uid;
+
+      // Check for existing chat between the users
+      final existingChat = await _firestore
+          .collection('chats')
+          .where('users', arrayContains: currentUserUid)
+          .get();
+
+      String? chatId;
+      for (var doc in existingChat.docs) {
+        final users = List<String>.from(doc['users']);
+        if (users.contains(userId)) {
+          chatId = doc.id;
+          break;
+        }
+      }
+
       // Get recipient user's data
       final userDoc = await _firestore.collection('users').doc(userId).get();
       final userData = userDoc.data() as Map<String, dynamic>;
       final recipientName = userData['first_name'] ?? 'Unknown User';
 
-      // Create a new chat document
-      final newChatDocRef = await _firestore.collection('chats').add({
-        'createdAt': FieldValue.serverTimestamp(),
-        'users': [userId, _auth.currentUser!.uid],
-        'recipientName': recipientName,
-      });
+      if (chatId == null) {
+        // Create a new chat document if no existing chat is found
+        final newChatDocRef = await _firestore.collection('chats').add({
+          'createdAt': FieldValue.serverTimestamp(),
+          'users': [userId, currentUserUid],
+          'recipientName': recipientName,
+        });
 
-      final newChatId = newChatDocRef.id;
+        chatId = newChatDocRef.id;
+      }
 
       emit(ChatLoaded(messages: const []));
 
-      GoRouter.of(navigatorKey.currentContext!)
-          .go('${Routers.conversation}/$newChatId');
+      GoRouter.of(navigatorKey.currentContext!).go(
+        '${Routers.conversation}/$chatId',
+        extra: recipientName, // Pass the recipient's name
+      );
 
-      loadMessages(newChatId);
+      loadMessages(chatId);
     } catch (e) {
       emit(ChatError(errorMessage: e.toString()));
     }

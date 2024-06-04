@@ -1,19 +1,24 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+
 import 'package:linkup/core/routes/routers.dart';
 import 'package:linkup/feature/auth/presentation/cubit/auth_cubit.dart';
 import 'package:linkup/feature/auth/presentation/cubit/auth_state.dart';
+import 'package:linkup/feature/auth/presentation/widgets/auth_text_form_field.dart';
 import 'package:linkup/feature/chat/presentation/cubit/chat_cubit.dart';
 import 'package:linkup/feature/chat/presentation/cubit/chat_state.dart';
 
 class ConversationPage extends StatelessWidget {
   final TextEditingController _controller = TextEditingController();
   final String chatId;
+  final String otherUserName;
 
   ConversationPage({
     Key? key,
     required this.chatId,
+    required this.otherUserName,
   }) : super(key: key);
 
   @override
@@ -22,12 +27,12 @@ class ConversationPage extends StatelessWidget {
       create: (context) => ChatCubit()..loadMessages(chatId),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Chat'),
+          title: Text(otherUserName),
           leading: IconButton(
             onPressed: () {
               context.go(Routers.allChats);
             },
-            icon: const Icon(Icons.arrow_back),
+            icon: const Icon(Icons.arrow_back_ios_new_rounded),
           ),
         ),
         body: Column(
@@ -43,10 +48,14 @@ class ConversationPage extends StatelessWidget {
                       itemCount: state.messages.length,
                       itemBuilder: (context, index) {
                         final message = state.messages[index];
-                        return ListTile(
-                          title: Text(message.text),
-                          tileColor:
-                              message.isSent ? Colors.blue : Colors.green,
+                        return ChatBubble(
+                          message: message.text,
+                          messageColor: message.isSent
+                              ? const Color.fromARGB(106, 33, 149, 243)
+                              : const Color.fromARGB(96, 94, 103, 107),
+                          alignment: message.isSent
+                              ? Alignment.centerRight
+                              : Alignment.centerLeft,
                         );
                       },
                     );
@@ -59,14 +68,18 @@ class ConversationPage extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.only(
+                left: 12.0,
+                right: 8.0,
+                bottom: 15,
+                top: 8,
+              ),
               child: Row(
                 children: <Widget>[
                   Expanded(
-                    child: TextField(
+                    child: AuthTextFormField(
                       controller: _controller,
-                      decoration:
-                          const InputDecoration(labelText: 'Send a message...'),
+                      hintText: 'Send a message...',
                     ),
                   ),
                   IconButton(
@@ -99,6 +112,42 @@ class ConversationPage extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class ChatBubble extends StatelessWidget {
+  const ChatBubble({
+    Key? key,
+    required this.message,
+    required this.messageColor,
+    required this.alignment,
+  }) : super(key: key);
+
+  final String message;
+  final Color messageColor;
+  final AlignmentGeometry alignment;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: alignment,
+      child: Container(
+        margin: const EdgeInsets.all(15),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width *
+              0.7, // Maximum width for the chat bubble
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+        decoration: BoxDecoration(
+          color: messageColor,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Text(
+          message,
+          style: const TextStyle(color: Colors.white),
         ),
       ),
     );

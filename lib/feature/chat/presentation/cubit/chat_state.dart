@@ -16,12 +16,10 @@ abstract class ChatState {
 }
 
 class ChatInitial extends ChatState {
-  @override
   List<Object?> get props => [];
 }
 
 class ChatLoading extends ChatState {
-  @override
   List<Object?> get props => [];
 }
 
