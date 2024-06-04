@@ -11,28 +11,24 @@ class ChatCubit extends Cubit<ChatState> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   ChatCubit() : super(ChatInitial());
-
   Future<void> loadMessages(String chatId) async {
     emit(ChatLoading());
-    try {
-      final QuerySnapshot chatSnapshot = await _firestore
-          .collection('chats')
-          .doc(chatId)
-          .collection('messages')
-          .orderBy('timestamp', descending: true)
-          .get();
+    final messagesStream = _firestore
+        .collection('chats')
+        .doc(chatId)
+        .collection('messages')
+        .orderBy('timestamp', descending: true)
+        .snapshots();
 
-      final List<Message> messages = chatSnapshot.docs
+    messagesStream.listen((snapshot) {
+      final messages = snapshot.docs
           .map((doc) => Message(
                 text: doc['text'] ?? '',
                 isSent: doc['userId'] == _auth.currentUser?.uid,
               ))
           .toList();
-
       emit(ChatLoaded(messages: messages));
-    } catch (e) {
-      emit(ChatError(errorMessage: e.toString()));
-    }
+    });
   }
 
   void sendMessage(

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:linkup/core/routes/routers.dart';
 import 'package:linkup/feature/auth/presentation/cubit/auth_cubit.dart';
 import 'package:linkup/feature/auth/presentation/cubit/auth_state.dart';
 import 'package:linkup/feature/chat/presentation/cubit/chat_cubit.dart';
@@ -19,7 +21,15 @@ class ConversationPage extends StatelessWidget {
     return BlocProvider(
       create: (context) => ChatCubit()..loadMessages(chatId),
       child: Scaffold(
-        appBar: AppBar(title: const Text('Chat')),
+        appBar: AppBar(
+          title: const Text('Chat'),
+          leading: IconButton(
+            onPressed: () {
+              context.go(Routers.allChats);
+            },
+            icon: const Icon(Icons.arrow_back),
+          ),
+        ),
         body: Column(
           children: [
             Expanded(
@@ -65,19 +75,22 @@ class ConversationPage extends StatelessWidget {
                       final state = context.read<AuthCubit>().state;
                       if (state is SignInSuccessState) {
                         final userId = state.user.uid;
+                        final messageText = _controller.text;
+
+                        // Update UI with the sent message immediately
+                        context.read<ChatCubit>().addMessage(
+                              Message(text: messageText, isSent: true),
+                            );
+
                         context.read<ChatCubit>().sendMessage(
                               chatId,
-                              _controller.text,
+                              messageText,
                               userId,
                               true,
                             );
-                        context.read<ChatCubit>().addMessage(
-                              Message(
-                                text: _controller.text,
-                                isSent: true,
-                              ),
-                            );
+
                         _controller.clear();
+
                         context.read<ChatCubit>().loadMessages(chatId);
                       }
                     },
