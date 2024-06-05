@@ -7,7 +7,7 @@ import 'package:linkup/core/routes/routers.dart';
 import 'package:linkup/feature/auth/presentation/cubit/auth_cubit.dart';
 import 'package:linkup/feature/auth/presentation/views/login_page.dart';
 import 'package:linkup/feature/auth/presentation/views/sign_up_page.dart';
-import 'package:linkup/feature/chat/presentation/cubit/chat_cubit.dart';
+import 'package:linkup/feature/chat/presentation/cubit/chat_cubit/chat_cubit.dart';
 import 'package:linkup/feature/chat/presentation/view/all_chats_view.dart';
 import 'package:linkup/feature/chat/presentation/view/all_users_page.dart';
 import 'package:linkup/feature/chat/presentation/view/conversation_view.dart';

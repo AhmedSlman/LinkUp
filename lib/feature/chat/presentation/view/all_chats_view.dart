@@ -1,10 +1,13 @@
+// ignore_for_file: unused_local_variable
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 import 'package:linkup/core/routes/routers.dart';
 import 'package:linkup/feature/auth/presentation/cubit/auth_cubit.dart';
 import 'package:linkup/feature/auth/presentation/cubit/auth_state.dart';
+import 'package:linkup/feature/chat/presentation/cubit/chatList_cubit/chat_list_cubit.dart';
+import 'package:linkup/feature/chat/presentation/cubit/chatList_cubit/chat_list_state.dart';
 
 class AllChatsPage extends StatelessWidget {
   const AllChatsPage({super.key});
@@ -28,86 +31,34 @@ class AllChatsPage extends StatelessWidget {
           ),
         ],
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('chats')
-            .where('users', arrayContains: currentUserId)
-            .snapshots(),
-        builder: (ctx, AsyncSnapshot<QuerySnapshot> chatSnapshot) {
-          if (chatSnapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          final chatDocs = chatSnapshot.data!.docs;
-
-          return ListView.builder(
-            itemCount: chatDocs.length,
-            itemBuilder: (ctx, index) {
-              final chatDoc = chatDocs[index];
-              final users =
-                  List<String>.from(chatDoc['users'] as List).cast<String>();
-              // Get the other user's name based on current user ID
-              final otherUserId = users.firstWhere((id) => id != currentUserId);
-
-              return StreamBuilder<DocumentSnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('users')
-                    .doc(otherUserId)
-                    .snapshots(),
-                builder: (context, userSnapshot) {
-                  if (userSnapshot.hasData) {
-                    final otherUserData = userSnapshot.data!;
-                    final otherUserName =
-                        otherUserData['first_name']?.toString();
-
-                    return StreamBuilder<QuerySnapshot>(
-                      stream: FirebaseFirestore.instance
-                          .collection('chats')
-                          .doc(chatDoc.id)
-                          .collection('messages')
-                          .orderBy('timestamp', descending: true)
-                          .limit(1)
-                          .snapshots(),
-                      builder: (context, messageSnapshot) {
-                        if (messageSnapshot.hasData &&
-                            messageSnapshot.data!.docs.isNotEmpty) {
-                          final latestMessageDoc =
-                              messageSnapshot.data!.docs.first;
-                          final latestMessageText =
-                              latestMessageDoc['text']?.toString();
-
-                          return ListTile(
-                            title: Text(otherUserName ?? 'Loading...'),
-                            subtitle: Text(latestMessageText ?? ''),
-                            onTap: () {
-                              final chatId = chatDoc.id;
-                              context.go('${Routers.conversation}/$chatId',
-                                  extra: otherUserName);
-                            },
-                          );
-                        } else {
-                          return ListTile(
-                            title: Text(otherUserName ?? 'Loading...'),
-                            subtitle: const Text('No messages yet'),
-                            onTap: () {
-                              final chatId = chatDoc.id;
-                              context.go('${Routers.conversation}/$chatId',
-                                  extra: otherUserName);
-                            },
-                          );
-                        }
-                      },
-                    );
-                  } else {
-                    return const ListTile(
-                      title: Text('Loading...'),
-                    );
-                  }
+      body: BlocProvider(
+        create: (context) => ChatListCubit()..loadChatList(),
+        child: BlocBuilder<ChatListCubit, ChatListState>(
+          builder: (context, state) {
+            if (state is ChatListLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is ChatListLoaded) {
+              return ListView.builder(
+                itemCount: state.chats.length,
+                itemBuilder: (ctx, index) {
+                  final chatItem = state.chats[index];
+                  return ListTile(
+                    title: Text(chatItem.otherUserName),
+                    subtitle: Text(chatItem.latestMessage),
+                    onTap: () {
+                      context.go('${Routers.conversation}/${chatItem.chatId}',
+                          extra: chatItem.otherUserName);
+                    },
+                  );
                 },
               );
-            },
-          );
-        },
+            } else if (state is ChatListError) {
+              return Center(child: Text(state.errorMessage));
+            } else {
+              return const Center(child: Text('Something went wrong'));
+            }
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),

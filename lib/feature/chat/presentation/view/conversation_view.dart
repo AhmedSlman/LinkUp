@@ -7,8 +7,9 @@ import 'package:linkup/core/routes/routers.dart';
 import 'package:linkup/feature/auth/presentation/cubit/auth_cubit.dart';
 import 'package:linkup/feature/auth/presentation/cubit/auth_state.dart';
 import 'package:linkup/feature/auth/presentation/widgets/auth_text_form_field.dart';
-import 'package:linkup/feature/chat/presentation/cubit/chat_cubit.dart';
-import 'package:linkup/feature/chat/presentation/cubit/chat_state.dart';
+import 'package:linkup/feature/chat/data/message_model.dart';
+import 'package:linkup/feature/chat/presentation/cubit/chat_cubit/chat_cubit.dart';
+import 'package:linkup/feature/chat/presentation/cubit/chat_cubit/chat_state.dart';
 
 class ConversationPage extends StatelessWidget {
   final TextEditingController _controller = TextEditingController();

@@ -1,15 +1,4 @@
-class Message {
-  final String text;
-  final bool isSent;
-
-  Message({
-    required this.text,
-    required this.isSent,
-  });
-
-  @override
-  List<Object?> get props => [text, isSent];
-}
+import 'package:linkup/feature/chat/data/message_model.dart';
 
 abstract class ChatState {
   const ChatState();

@@ -3,7 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:linkup/core/routes/app_router.dart';
 import 'package:linkup/core/routes/routers.dart';
-import 'package:linkup/feature/chat/presentation/cubit/chat_state.dart';
+import 'package:linkup/feature/chat/data/message_model.dart';
+import 'package:linkup/feature/chat/presentation/cubit/chat_cubit/chat_state.dart';
 import 'package:go_router/go_router.dart';
 
 class ChatCubit extends Cubit<ChatState> {
