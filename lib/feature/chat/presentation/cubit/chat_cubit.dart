@@ -11,6 +11,7 @@ class ChatCubit extends Cubit<ChatState> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   ChatCubit() : super(ChatInitial());
+
   Future<void> loadMessages(String chatId) async {
     emit(ChatLoading());
     final messagesStream = _firestore
@@ -21,6 +22,9 @@ class ChatCubit extends Cubit<ChatState> {
         .snapshots();
 
     messagesStream.listen((snapshot) {
+      if (isClosed) return;
+
+      // ignore: curly_braces_in_flow_control_structures
       final messages = snapshot.docs
           .map((doc) => Message(
                 text: doc['text'] ?? '',
@@ -65,10 +69,8 @@ class ChatCubit extends Cubit<ChatState> {
   Future<void> createNewChat(String userId) async {
     emit(ChatLoading());
     try {
-      // Get current user's ID
       final currentUserUid = _auth.currentUser!.uid;
 
-      // Check for existing chat between the users
       final existingChat = await _firestore
           .collection('chats')
           .where('users', arrayContains: currentUserUid)
@@ -83,13 +85,11 @@ class ChatCubit extends Cubit<ChatState> {
         }
       }
 
-      // Get recipient user's data
       final userDoc = await _firestore.collection('users').doc(userId).get();
       final userData = userDoc.data() as Map<String, dynamic>;
       final recipientName = userData['first_name'] ?? 'Unknown User';
 
       if (chatId == null) {
-        // Create a new chat document if no existing chat is found
         final newChatDocRef = await _firestore.collection('chats').add({
           'createdAt': FieldValue.serverTimestamp(),
           'users': [userId, currentUserUid],
@@ -103,7 +103,7 @@ class ChatCubit extends Cubit<ChatState> {
 
       GoRouter.of(navigatorKey.currentContext!).go(
         '${Routers.conversation}/$chatId',
-        extra: recipientName, // Pass the recipient's name
+        extra: recipientName,
       );
 
       loadMessages(chatId);

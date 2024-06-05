@@ -34,74 +34,76 @@ class _LoginPageState extends State<LoginPage> {
             );
           }
         },
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                SizedBox(height: MediaQuery.of(context).size.height * 0.1),
-                const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Welcme Back!",
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w400,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.1),
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Welcme Back!",
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.05),
-                AuthTextFormField(
-                  controller: _emailController,
-                  hintText: 'Email',
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                AuthTextFormField(
-                  controller: _passwordController,
-                  hintText: 'Password',
-                  isOscureText: true,
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-                const Align(
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    "Forgot Password?",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w300,
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+                  AuthTextFormField(
+                    controller: _emailController,
+                    hintText: 'Email',
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                  AuthTextFormField(
+                    controller: _passwordController,
+                    hintText: 'Password',
+                    isOscureText: true,
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                  const Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      "Forgot Password?",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w300,
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.03),
-                BlocBuilder<AuthCubit, AuthState>(
-                  builder: (context, state) {
-                    if (state is SignInLoadingState) {
-                      return const CircularProgressIndicator();
-                    } else {
-                      return AuthGradientButton(
-                        text: 'Sign In',
-                        onTap: () {
-                          if (_formKey.currentState!.validate()) {
-                            context.read<AuthCubit>().signIn(
-                                  _emailController.text,
-                                  _passwordController.text,
-                                );
-                          }
-                        },
-                      );
-                    }
-                  },
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                HaveAnAcountWidget(
-                  text1: 'Don\'t have an account?',
-                  text2: ' Sign Up',
-                  onTab: () {
-                    context.go(Routers.signUp);
-                  },
-                ),
-              ],
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+                  BlocBuilder<AuthCubit, AuthState>(
+                    builder: (context, state) {
+                      if (state is SignInLoadingState) {
+                        return const CircularProgressIndicator();
+                      } else {
+                        return AuthGradientButton(
+                          text: 'Sign In',
+                          onTap: () {
+                            if (_formKey.currentState!.validate()) {
+                              context.read<AuthCubit>().signIn(
+                                    _emailController.text,
+                                    _passwordController.text,
+                                  );
+                            }
+                          },
+                        );
+                      }
+                    },
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                  HaveAnAcountWidget(
+                    text1: 'Don\'t have an account?',
+                    text2: ' Sign Up',
+                    onTab: () {
+                      context.go(Routers.signUp);
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),

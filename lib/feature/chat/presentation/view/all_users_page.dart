@@ -33,9 +33,11 @@ class AllUsersPage extends StatelessWidget {
             itemBuilder: (ctx, index) {
               final userData = usersDocs[index].data() as Map<String, dynamic>;
               final firstName = userData['first_name'] ?? 'No Username';
+              final userEmail = userData['email'] ?? 'No Email';
               final userId = usersDocs[index].id;
               return ListTile(
                 title: Text(firstName),
+                subtitle: Text(userEmail),
                 onTap: () {
                   final chatCubit = context.read<ChatCubit>();
                   chatCubit.createNewChat(userId);

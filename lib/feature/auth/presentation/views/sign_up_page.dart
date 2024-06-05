@@ -40,77 +40,79 @@ class _SignUpPageState extends State<SignUpPage> {
             );
           }
         },
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                SizedBox(height: MediaQuery.of(context).size.height * 0.1),
-                const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Create a new account",
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w400,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.1),
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Create a new account",
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.05),
-                AuthTextFormField(
-                  controller: _firstNameController,
-                  hintText: 'First Name',
-                  onChanged: (firstName) {
-                    authCubit.firstName = firstName;
-                  },
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                AuthTextFormField(
-                  controller: _lastNameController,
-                  hintText: 'Last Name',
-                  onChanged: (lastName) {
-                    authCubit.lastName = lastName;
-                  },
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                AuthTextFormField(
-                  controller: _emailController,
-                  hintText: 'Email',
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                AuthTextFormField(
-                  controller: _passwordController,
-                  hintText: 'Password',
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                const SizedBox(height: 20),
-                BlocBuilder<AuthCubit, AuthState>(
-                  builder: (context, state) {
-                    if (state is SignUpLoadingState) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else {
-                      return AuthGradientButton(
-                        text: 'Sign Up',
-                        onTap: () {
-                          authCubit.signUp(
-                            _emailController.text,
-                            _passwordController.text,
-                          );
-                        },
-                      );
-                    }
-                  },
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                HaveAnAcountWidget(
-                  text1: 'Already have an account?',
-                  text2: ' Login ',
-                  onTab: () {
-                    context.go(Routers.login);
-                  },
-                ),
-              ],
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+                  AuthTextFormField(
+                    controller: _firstNameController,
+                    hintText: 'First Name',
+                    onChanged: (firstName) {
+                      authCubit.firstName = firstName;
+                    },
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                  AuthTextFormField(
+                    controller: _lastNameController,
+                    hintText: 'Last Name',
+                    onChanged: (lastName) {
+                      authCubit.lastName = lastName;
+                    },
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                  AuthTextFormField(
+                    controller: _emailController,
+                    hintText: 'Email',
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                  AuthTextFormField(
+                    controller: _passwordController,
+                    hintText: 'Password',
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                  const SizedBox(height: 20),
+                  BlocBuilder<AuthCubit, AuthState>(
+                    builder: (context, state) {
+                      if (state is SignUpLoadingState) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else {
+                        return AuthGradientButton(
+                          text: 'Sign Up',
+                          onTap: () {
+                            authCubit.signUp(
+                              _emailController.text,
+                              _passwordController.text,
+                            );
+                          },
+                        );
+                      }
+                    },
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                  HaveAnAcountWidget(
+                    text1: 'Already have an account?',
+                    text2: ' Login ',
+                    onTab: () {
+                      context.go(Routers.login);
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),

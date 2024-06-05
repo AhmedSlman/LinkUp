@@ -49,7 +49,10 @@ abstract class AppRouter {
       ),
       GoRoute(
         path: Routers.allChats,
-        builder: (context, state) => const AllChatsPage(),
+        builder: (context, state) => BlocProvider(
+          create: (context) => ChatCubit(),
+          child: const AllChatsPage(),
+        ),
       ),
       GoRoute(
         path: '${Routers.conversation}/:chatId',
