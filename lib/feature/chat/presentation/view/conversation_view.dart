@@ -31,7 +31,7 @@ class ConversationPage extends StatelessWidget {
           title: Text(otherUserName),
           leading: IconButton(
             onPressed: () {
-              context.go(Routers.allChats);
+              context.go(Routers.navigationBottom);
             },
             icon: const Icon(Icons.arrow_back_ios_new_rounded),
           ),

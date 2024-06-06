@@ -1,4 +1,4 @@
-import 'package:linkup/feature/chat/data/user_model.dart';
+import 'package:linkup/feature/chat/data/user_item_model.dart';
 
 abstract class AllUsersState {
   const AllUsersState();

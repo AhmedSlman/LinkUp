@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:linkup/core/routes/routers.dart';
+import 'package:linkup/core/utils/app_colors.dart';
 import 'package:linkup/feature/auth/presentation/cubit/auth_cubit.dart';
 import 'package:linkup/feature/auth/presentation/cubit/auth_state.dart';
 import 'package:linkup/feature/chat/presentation/cubit/chatList_cubit/chat_list_cubit.dart';
@@ -61,6 +62,7 @@ class AllChatsPage extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors.primaryColor,
         child: const Icon(Icons.add),
         onPressed: () {
           context.go(Routers.allUsers);

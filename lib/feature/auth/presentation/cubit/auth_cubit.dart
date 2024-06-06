@@ -1,29 +1,38 @@
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:meta/meta.dart';
+import 'package:linkup/feature/auth/data/user_model.dart';
 import 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  AuthCubit() : super(AuthInitial());
 
   String? firstName;
   String? lastName;
-  String? emailAddress;
+  AuthCubit() : super(AuthInitial());
 
   void checkAuthState() async {
     final user = _auth.currentUser;
     if (user != null) {
-      emit(
-          SignInSuccessState(user: user)); // Assuming user is already signed in
+      final userData = await _loadUserData(user.uid);
+      emit(SignInSuccessState(user: user, userData: userData));
     } else {
       emit(AuthInitial());
     }
   }
 
-  void signUp(String email, String password) async {
+  Future<UserModel> _loadUserData(String userId) async {
+    final doc = await _firestore.collection('users').doc(userId).get();
+    return UserModel.fromFirestore(doc);
+  }
+
+  void signUp(
+    String email,
+    String password,
+    String? firstName,
+    String? lastName,
+  ) async {
     emit(SignUpLoadingState());
     try {
       UserCredential userCredential =
@@ -31,8 +40,12 @@ class AuthCubit extends Cubit<AuthState> {
         email: email,
         password: password,
       );
-      await addUserProfile(userCredential.user!);
-      emit(SignUpSuccessState());
+      await userCredential.user!.updateDisplayName(
+        '$firstName $lastName',
+      );
+      await addUserProfile(userCredential.user!, firstName!, lastName!);
+      final userData = await _loadUserData(userCredential.user!.uid);
+      emit(SignUpSuccessState(user: userCredential.user!, userData: userData));
     } on FirebaseAuthException catch (e) {
       _sigUpHandelException(e);
     } catch (e) {
@@ -44,13 +57,21 @@ class AuthCubit extends Cubit<AuthState> {
     emit(SignInLoadingState());
     try {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-          email: email, password: password);
-      emit(SignInSuccessState(user: userCredential.user!));
+        email: email,
+        password: password,
+      );
+      final userData = await _loadUserData(userCredential.user!.uid);
+      emit(SignInSuccessState(user: userCredential.user!, userData: userData));
     } on FirebaseAuthException catch (e) {
       _sigInHandelException(e);
     } catch (e) {
       emit(SignInFailuerState(errMessage: e.toString()));
     }
+  }
+
+  void signOut() async {
+    await _auth.signOut();
+    emit(AuthInitial());
   }
 
   void _sigUpHandelException(FirebaseAuthException e) {
@@ -78,38 +99,14 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  void signOut() async {
-    await _auth.signOut();
-    emit(AuthInitial());
-  }
-
-  void resetPassword(String email) async {
-    await _auth.sendPasswordResetEmail(email: email);
-  }
-
-  Future<void> deleteAccount() async {
-    await _auth.currentUser!.delete();
-  }
-
-  Future<void> sendEmailVerification() async {
-    await _auth.currentUser!.sendEmailVerification();
-  }
-
-  Future<void> addUserProfile(User user) async {
+  Future<void> addUserProfile(
+      User user, String firstName, String lastName) async {
     CollectionReference users = FirebaseFirestore.instance.collection('users');
     await users.doc(user.uid).set({
       "first_name": firstName,
       "last_name": lastName,
       "email": user.email,
-    });
-  }
-
-  Future<Stream<List<Map<String, dynamic>>>> getAllUsers() async {
-    return _firestore.collection("Users").snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) {
-        final user = doc.data();
-        return user;
-      }).toList();
+      "photo_url": user.photoURL ?? '',
     });
   }
 }

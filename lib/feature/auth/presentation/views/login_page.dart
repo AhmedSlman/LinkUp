@@ -27,7 +27,7 @@ class _LoginPageState extends State<LoginPage> {
       body: BlocListener<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is SignInSuccessState) {
-            context.go(Routers.allChats);
+            context.go(Routers.navigationBottom);
           } else if (state is SignInFailuerState) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.errMessage)),

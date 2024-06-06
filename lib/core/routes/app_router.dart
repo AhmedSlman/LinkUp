@@ -11,6 +11,7 @@ import 'package:linkup/feature/chat/presentation/cubit/chat_cubit/chat_cubit.dar
 import 'package:linkup/feature/chat/presentation/view/all_chats_view.dart';
 import 'package:linkup/feature/chat/presentation/view/all_users_page.dart';
 import 'package:linkup/feature/chat/presentation/view/conversation_view.dart';
+import 'package:linkup/feature/navigation_bar.dart';
 import 'package:linkup/feature/splash/splash_page.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -25,6 +26,10 @@ abstract class AppRouter {
           create: (context) => AuthCubit(),
           child: const SplashPage(),
         ),
+      ),
+      GoRoute(
+        path: Routers.navigationBottom,
+        builder: (context, state) => const NavigationBarButton(),
       ),
       GoRoute(
         path: Routers.login,

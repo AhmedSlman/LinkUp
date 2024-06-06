@@ -6,4 +6,5 @@ class Routers {
   static const String allChats = "/allChats";
   static const String conversation = "/conversation";
   static const String allUsers = '/allUsers';
+  static const String navigationBottom = '/navigationBottom';
 }

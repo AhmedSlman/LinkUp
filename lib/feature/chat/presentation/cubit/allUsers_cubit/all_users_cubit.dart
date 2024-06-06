@@ -3,7 +3,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:linkup/feature/chat/data/user_model.dart';
+import 'package:linkup/feature/chat/data/user_item_model.dart';
 import 'package:linkup/feature/chat/presentation/cubit/allUsers_cubit/all_users_state.dart';
 import 'package:linkup/feature/chat/presentation/cubit/chat_cubit/chat_cubit.dart';
 

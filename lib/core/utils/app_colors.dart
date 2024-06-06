@@ -11,4 +11,5 @@ class AppColors {
   static const Color errorColor = Colors.redAccent;
   static const Color transparentColor = Colors.transparent;
   static const Color textFormFill = Color(0xff94A3C7);
+  static const Color primaryColor = Color(0xff3B73E8);
 }

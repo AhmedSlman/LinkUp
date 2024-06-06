@@ -67,7 +67,7 @@ class _SplashPageState extends State<SplashPage> {
       if (FirebaseAuth.instance.currentUser == null) {
         context.go(Routers.login);
       } else {
-        context.go(Routers.allChats);
+        context.go(Routers.navigationBottom);
       }
     });
   }

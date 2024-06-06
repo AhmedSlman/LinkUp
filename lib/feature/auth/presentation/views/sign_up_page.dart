@@ -33,8 +33,8 @@ class _SignUpPageState extends State<SignUpPage> {
       body: BlocListener<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is SignUpSuccessState) {
-            context.go(Routers.allChats);
-          } else if (state is SignUpFailuerState) {
+            context.go(Routers.navigationBottom);
+          } else if (state is SignInFailuerState) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.errMessage)),
             );
@@ -61,7 +61,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   SizedBox(height: MediaQuery.of(context).size.height * 0.05),
                   AuthTextFormField(
                     controller: _firstNameController,
-                    hintText: 'First Name',
+                    hintText: 'Your Name',
                     onChanged: (firstName) {
                       authCubit.firstName = firstName;
                     },
@@ -97,6 +97,8 @@ class _SignUpPageState extends State<SignUpPage> {
                             authCubit.signUp(
                               _emailController.text,
                               _passwordController.text,
+                              _firstNameController.text,
+                              _lastNameController.text,
                             );
                           },
                         );
