@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -15,11 +14,13 @@ class ConversationPage extends StatelessWidget {
   final TextEditingController _controller = TextEditingController();
   final String chatId;
   final String otherUserName;
+  final String? photoUrl;
 
   ConversationPage({
     Key? key,
     required this.chatId,
     required this.otherUserName,
+    this.photoUrl,
   }) : super(key: key);
 
   @override
@@ -28,7 +29,16 @@ class ConversationPage extends StatelessWidget {
       create: (context) => ChatCubit()..loadMessages(chatId),
       child: Scaffold(
         appBar: AppBar(
-          title: Text(otherUserName),
+          title: ListTile(
+            leading: photoUrl != null
+                ? CircleAvatar(
+                    backgroundImage: NetworkImage(photoUrl!),
+                  )
+                : const CircleAvatar(
+                    child: Icon(Icons.person),
+                  ),
+            title: Text(otherUserName),
+          ),
           leading: IconButton(
             onPressed: () {
               context.go(Routers.navigationBottom);
@@ -138,8 +148,7 @@ class ChatBubble extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.all(15),
         constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width *
-              0.7, // Maximum width for the chat bubble
+          maxWidth: MediaQuery.of(context).size.width * 0.7,
         ),
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
         decoration: BoxDecoration(

@@ -44,11 +44,20 @@ class AllChatsPage extends StatelessWidget {
                 itemBuilder: (ctx, index) {
                   final chatItem = state.chats[index];
                   return ListTile(
+                    leading: chatItem.photoUrl != null
+                        ? CircleAvatar(
+                            backgroundImage: NetworkImage(chatItem.photoUrl!),
+                          )
+                        : const CircleAvatar(
+                            child: Icon(Icons.person),
+                          ),
                     title: Text(chatItem.otherUserName),
                     subtitle: Text(chatItem.latestMessage),
                     onTap: () {
-                      context.go('${Routers.conversation}/${chatItem.chatId}',
-                          extra: chatItem.otherUserName);
+                      context.go(
+                        '${Routers.conversation}/${chatItem.chatId}',
+                        extra: chatItem.otherUserName,
+                      );
                     },
                   );
                 },

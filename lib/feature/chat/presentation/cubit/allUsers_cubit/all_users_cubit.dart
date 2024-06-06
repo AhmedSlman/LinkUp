@@ -35,6 +35,7 @@ class AllUsersCubit extends Cubit<AllUsersState> {
           userId: doc.id,
           firstName: userData['first_name'] ?? 'No Username',
           email: userData['email'] ?? 'No Email',
+          photoUrl: userData['photo_url'],
         ));
       }
 

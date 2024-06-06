@@ -63,8 +63,7 @@ abstract class AppRouter {
         path: '${Routers.conversation}/:chatId',
         builder: (context, state) {
           final chatId = state.pathParameters['chatId']!;
-          final otherUserName =
-              state.extra as String? ?? 'Unknown User'; // تعيين قيمة افتراضية
+          final otherUserName = state.extra as String? ?? 'Unknown User';
 
           return MultiBlocProvider(
             providers: [

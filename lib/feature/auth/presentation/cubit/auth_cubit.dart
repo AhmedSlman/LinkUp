@@ -1,12 +1,16 @@
+import 'dart:io';
+
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:linkup/feature/auth/data/user_model.dart';
 import 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
 
   String? firstName;
   String? lastName;
@@ -108,5 +112,29 @@ class AuthCubit extends Cubit<AuthState> {
       "email": user.email,
       "photo_url": user.photoURL ?? '',
     });
+  }
+
+  Future<void> uploadProfilePicture(String userId, File imageFile) async {
+    try {
+      // رفع الصورة إلى Firebase Storage
+      final ref =
+          _storage.ref().child('user_profile_pictures').child('$userId.jpg');
+      await ref.putFile(imageFile);
+
+      // الحصول على رابط الصورة
+      final photoURL = await ref.getDownloadURL();
+
+      // تحديث رابط الصورة في Firestore
+      await _firestore
+          .collection('users')
+          .doc(userId)
+          .update({'photo_url': photoURL});
+
+      // تحديث الحالة لتشمل رابط الصورة الجديد
+      final userData = await _loadUserData(userId);
+      emit(SignInSuccessState(user: _auth.currentUser!, userData: userData));
+    } catch (e) {
+      print('Error uploading profile picture: $e');
+    }
   }
 }

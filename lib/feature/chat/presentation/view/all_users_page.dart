@@ -36,6 +36,13 @@ class AllUsersPage extends StatelessWidget {
                 itemBuilder: (ctx, index) {
                   final userItem = state.users[index];
                   return ListTile(
+                    leading: userItem.photoUrl != null
+                        ? CircleAvatar(
+                            backgroundImage: NetworkImage(userItem.photoUrl!),
+                          )
+                        : const CircleAvatar(
+                            child: Icon(Icons.person),
+                          ),
                     title: Text(userItem.firstName),
                     subtitle: Text(userItem.email),
                     onTap: () {

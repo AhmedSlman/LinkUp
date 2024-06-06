@@ -52,6 +52,9 @@ class ChatListCubit extends Cubit<ChatListState> {
             .doc(otherUserId)
             .get();
         final otherUserName = userDoc[AppConstants.KuserName] ?? 'Unknown User';
+        final otherUserDoc =
+            await _firestore.collection('users').doc(otherUserId).get();
+        final otherUserData = otherUserDoc.data();
 
         final latestMessageDoc = await _firestore
             .collection(AppConstants.KchatsCollection)
@@ -70,6 +73,7 @@ class ChatListCubit extends Cubit<ChatListState> {
           otherUserId: otherUserId,
           otherUserName: otherUserName,
           latestMessage: latestMessageText,
+          photoUrl: otherUserData?['photo_url'], // تحميل رابط الصورة
         ));
       }
 
