@@ -109,6 +109,7 @@ class ChatCubit extends Cubit<ChatState> {
           latestMessage: '',
           photoUrl: photoUrl,
           email: '',
+          timestamp: Timestamp.now(),
         ),
       );
 

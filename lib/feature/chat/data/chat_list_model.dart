@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class AllUsersModel {
   final String chatId;
   final String otherUserId;
@@ -5,7 +7,9 @@ class AllUsersModel {
   final String latestMessage;
   final String email;
 
-  final String? photoUrl; // إضافة حقل الصورة
+  final String? photoUrl;
+  final Timestamp timestamp; // Adding timestamp field
+// إضافة حقل الصورة
 
   AllUsersModel({
     required this.chatId,
@@ -14,5 +18,6 @@ class AllUsersModel {
     required this.latestMessage,
     this.photoUrl,
     required this.email,
+    required this.timestamp,
   });
 }

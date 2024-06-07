@@ -78,8 +78,14 @@ class ChatListCubit extends Cubit<ChatListState> {
           otherUserName: otherUserName,
           latestMessage: latestMessageText,
           photoUrl: otherUserData?['photo_url'], // تحميل رابط الصورة
+          timestamp: latestMessageDoc.docs.isNotEmpty
+              ? latestMessageDoc.docs.first[AppConstants.Ktimestamp]
+              : Timestamp.now(), // Adding timestamp for sorting
         ));
       }
+
+      // Sorting chats by latest message timestamp in descending order
+      chats.sort((a, b) => b.timestamp.compareTo(a.timestamp));
 
       emit(ChatListLoaded(chats));
     } catch (e) {
@@ -110,7 +116,7 @@ class ChatListCubit extends Cubit<ChatListState> {
           email: userData['email'] ?? 'No Email',
           photoUrl: userData['photo_url'],
           chatId: '', // لا توجد محادثة بعد
-          latestMessage: '',
+          latestMessage: '', timestamp: Timestamp.now(),
         ));
       }
 
