@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:linkup/core/routes/app_router.dart';
 import 'package:linkup/core/routes/routers.dart';
+import 'package:linkup/feature/chat/data/chat_list_model.dart';
 import 'package:linkup/feature/chat/data/message_model.dart';
 import 'package:linkup/feature/chat/presentation/cubit/chat_cubit/chat_state.dart';
 import 'package:go_router/go_router.dart';
@@ -25,7 +26,6 @@ class ChatCubit extends Cubit<ChatState> {
     messagesStream.listen((snapshot) {
       if (isClosed) return;
 
-      // ignore: curly_braces_in_flow_control_structures
       final messages = snapshot.docs
           .map((doc) => Message(
                 text: doc['text'] ?? '',
@@ -67,7 +67,8 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
-  Future<void> createNewChat(String userId) async {
+  Future<void> createNewChat(
+      String userId, String userName, String? photoUrl) async {
     emit(ChatLoading());
     try {
       final currentUserUid = _auth.currentUser!.uid;
@@ -86,15 +87,12 @@ class ChatCubit extends Cubit<ChatState> {
         }
       }
 
-      final userDoc = await _firestore.collection('users').doc(userId).get();
-      final userData = userDoc.data() as Map<String, dynamic>;
-      final recipientName = userData['first_name'] ?? 'Unknown User';
-
       if (chatId == null) {
         final newChatDocRef = await _firestore.collection('chats').add({
           'createdAt': FieldValue.serverTimestamp(),
           'users': [userId, currentUserUid],
-          'recipientName': recipientName,
+          'recipientName': userName,
+          'photo_url': photoUrl,
         });
 
         chatId = newChatDocRef.id;
@@ -104,7 +102,14 @@ class ChatCubit extends Cubit<ChatState> {
 
       GoRouter.of(navigatorKey.currentContext!).go(
         '${Routers.conversation}/$chatId',
-        extra: recipientName,
+        extra: AllUsersModel(
+          chatId: chatId!,
+          otherUserId: userId,
+          otherUserName: userName,
+          latestMessage: '',
+          photoUrl: photoUrl,
+          email: '',
+        ),
       );
 
       loadMessages(chatId);

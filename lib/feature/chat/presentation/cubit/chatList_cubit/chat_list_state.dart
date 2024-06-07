@@ -9,7 +9,7 @@ abstract class ChatListState {
 class ChatListLoading extends ChatListState {}
 
 class ChatListLoaded extends ChatListState {
-  final List<ChatListItem> chats;
+  final List<AllUsersModel> chats;
 
   const ChatListLoaded(this.chats);
 
@@ -21,6 +21,26 @@ class ChatListError extends ChatListState {
   final String errorMessage;
 
   const ChatListError(this.errorMessage);
+
+  @override
+  List<Object?> get props => [errorMessage];
+}
+
+class AllUsersLoading extends ChatListState {}
+
+class AllUsersLoaded extends ChatListState {
+  final List<AllUsersModel> users;
+
+  const AllUsersLoaded(this.users);
+
+  @override
+  List<Object?> get props => [users];
+}
+
+class AllUsersError extends ChatListState {
+  final String errorMessage;
+
+  const AllUsersError(this.errorMessage);
 
   @override
   List<Object?> get props => [errorMessage];

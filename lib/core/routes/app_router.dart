@@ -7,6 +7,7 @@ import 'package:linkup/core/routes/routers.dart';
 import 'package:linkup/feature/auth/presentation/cubit/auth_cubit.dart';
 import 'package:linkup/feature/auth/presentation/views/login_page.dart';
 import 'package:linkup/feature/auth/presentation/views/sign_up_page.dart';
+import 'package:linkup/feature/chat/data/chat_list_model.dart';
 import 'package:linkup/feature/chat/presentation/cubit/chat_cubit/chat_cubit.dart';
 import 'package:linkup/feature/chat/presentation/view/all_chats_view.dart';
 import 'package:linkup/feature/chat/presentation/view/all_users_page.dart';
@@ -63,18 +64,18 @@ abstract class AppRouter {
         path: '${Routers.conversation}/:chatId',
         builder: (context, state) {
           final chatId = state.pathParameters['chatId']!;
-          final otherUserName = state.extra as String? ?? 'Unknown User';
+          final chatItem = state.extra as AllUsersModel;
 
           return MultiBlocProvider(
             providers: [
-              BlocProvider.value(
-                  value: context.read<AuthCubit>()), // إعادة استخدام AuthCubit
+              BlocProvider.value(value: context.read<AuthCubit>()),
               BlocProvider(
                   create: (context) => ChatCubit()..loadMessages(chatId)),
             ],
             child: ConversationPage(
               chatId: chatId,
-              otherUserName: otherUserName,
+              otherUserName: chatItem.otherUserName,
+              photoUrl: chatItem.photoUrl,
             ),
           );
         },

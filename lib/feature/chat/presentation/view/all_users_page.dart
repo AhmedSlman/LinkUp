@@ -1,11 +1,7 @@
-// ignore_for_file: unused_local_variable
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:linkup/feature/auth/presentation/cubit/auth_cubit.dart';
-import 'package:linkup/feature/auth/presentation/cubit/auth_state.dart';
-import 'package:linkup/feature/chat/presentation/cubit/allUsers_cubit/all_users_cubit.dart';
-import 'package:linkup/feature/chat/presentation/cubit/allUsers_cubit/all_users_state.dart';
+import 'package:linkup/feature/chat/presentation/cubit/chatList_cubit/chat_list_cubit.dart';
+import 'package:linkup/feature/chat/presentation/cubit/chatList_cubit/chat_list_state.dart';
 import 'package:linkup/feature/chat/presentation/cubit/chat_cubit/chat_cubit.dart';
 
 class AllUsersPage extends StatelessWidget {
@@ -13,50 +9,45 @@ class AllUsersPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = context.read<AuthCubit>().state;
-    String currentUserUid = '';
-    if (state is SignInSuccessState) {
-      currentUserUid = state.user.uid;
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('All Users'),
       ),
       body: BlocProvider(
-        create: (context) =>
-            AllUsersCubit(context.read<ChatCubit>())..loadUsers(),
-        child: BlocBuilder<AllUsersCubit, AllUsersState>(
+        create: (context) => ChatListCubit()..loadUsers(),
+        child: BlocBuilder<ChatListCubit, ChatListState>(
           builder: (context, state) {
             if (state is AllUsersLoading) {
               return const Center(child: CircularProgressIndicator());
             } else if (state is AllUsersLoaded) {
               return ListView.builder(
                 itemCount: state.users.length,
-                itemBuilder: (ctx, index) {
-                  final userItem = state.users[index];
+                itemBuilder: (context, index) {
+                  final user = state.users[index];
                   return ListTile(
-                    leading: userItem.photoUrl != null
+                    leading: user.photoUrl != null
                         ? CircleAvatar(
-                            backgroundImage: NetworkImage(userItem.photoUrl!),
+                            backgroundImage: NetworkImage(user.photoUrl!),
                           )
                         : const CircleAvatar(
                             child: Icon(Icons.person),
                           ),
-                    title: Text(userItem.firstName),
-                    subtitle: Text(userItem.email),
+                    title: Text(user.otherUserName),
+                    subtitle: Text(user.email),
                     onTap: () {
-                      context
-                          .read<AllUsersCubit>()
-                          .createNewChat(userItem.userId);
+                      context.read<ChatListCubit>().createNewChat(
+                            user.otherUserId,
+                            user.otherUserName,
+                            user.photoUrl,
+                          );
                     },
                   );
                 },
               );
-            } else if (state is AllUsersError) {
+            } else if (state is ChatListError) {
               return Center(child: Text(state.errorMessage));
             } else {
-              return const Center(child: Text('Something went wrong'));
+              return const Center(child: Text('No users found'));
             }
           },
         ),

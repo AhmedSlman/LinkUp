@@ -6,11 +6,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:linkup/core/utils/app_constants.dart';
 import 'package:linkup/feature/chat/data/chat_list_model.dart';
 import 'package:linkup/feature/chat/presentation/cubit/chatList_cubit/chat_list_state.dart';
+import 'package:linkup/feature/chat/presentation/cubit/chat_cubit/chat_cubit.dart';
 
 class ChatListCubit extends Cubit<ChatListState> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final chatCubit = ChatCubit();
   String thisUser = '';
+
   ChatListCubit() : super(ChatListLoading());
 
   Future<void> loadChatList() async {
@@ -31,7 +34,7 @@ class ChatListCubit extends Cubit<ChatListState> {
           )
           .get();
 
-      List<ChatListItem> chats = [];
+      List<AllUsersModel> chats = [];
 
       for (var chatDoc in chatDocs.docs) {
         final users =
@@ -68,7 +71,8 @@ class ChatListCubit extends Cubit<ChatListState> {
             ? latestMessageDoc.docs.first[AppConstants.Ktext]
             : 'No messages yet';
 
-        chats.add(ChatListItem(
+        chats.add(AllUsersModel(
+          email: otherUserData?['email'] ?? 'No Email',
           chatId: chatDoc.id,
           otherUserId: otherUserId,
           otherUserName: otherUserName,
@@ -81,5 +85,42 @@ class ChatListCubit extends Cubit<ChatListState> {
     } catch (e) {
       emit(ChatListError(e.toString()));
     }
+  }
+
+  Future<void> loadUsers() async {
+    emit(AllUsersLoading());
+
+    try {
+      final currentUserUid = _auth.currentUser?.uid;
+      if (currentUserUid == null) {
+        emit(const AllUsersError('No current user'));
+        return;
+      }
+
+      final usersDocs = await _firestore.collection('users').get();
+      List<AllUsersModel> users = [];
+
+      for (var doc in usersDocs.docs) {
+        if (doc.id == currentUserUid) continue;
+
+        final userData = doc.data();
+        users.add(AllUsersModel(
+          otherUserId: doc.id,
+          otherUserName: userData['first_name'] ?? 'No Username',
+          email: userData['email'] ?? 'No Email',
+          photoUrl: userData['photo_url'],
+          chatId: '', // لا توجد محادثة بعد
+          latestMessage: '',
+        ));
+      }
+
+      emit(AllUsersLoaded(users));
+    } catch (e) {
+      emit(AllUsersError(e.toString()));
+    }
+  }
+
+  void createNewChat(String userId, String userName, String? photoUrl) {
+    chatCubit.createNewChat(userId, userName, photoUrl);
   }
 }

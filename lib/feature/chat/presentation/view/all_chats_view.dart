@@ -56,7 +56,7 @@ class AllChatsPage extends StatelessWidget {
                     onTap: () {
                       context.go(
                         '${Routers.conversation}/${chatItem.chatId}',
-                        extra: chatItem.otherUserName,
+                        extra: chatItem,
                       );
                     },
                   );
