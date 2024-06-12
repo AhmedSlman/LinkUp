@@ -8,9 +8,7 @@ class AllUsersModel {
   final String email;
 
   final String? photoUrl;
-  final Timestamp timestamp; // Adding timestamp field
-// إضافة حقل الصورة
-
+  final Timestamp timestamp;
   AllUsersModel({
     required this.chatId,
     required this.otherUserId,

@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:linkup/feature/auth/data/user_model.dart';
+import 'package:linkup/feature/auth/data/models/user_model.dart';
 import 'package:meta/meta.dart';
 
 @immutable
@@ -15,9 +15,9 @@ class SignUpSuccessState extends AuthState {
   SignUpSuccessState({required this.user, required this.userData});
 }
 
-class SignUpFailuerState extends AuthState {
+class SignUpFailureState extends AuthState {
   final String errMessage;
-  SignUpFailuerState({required this.errMessage});
+  SignUpFailureState({required this.errMessage});
 }
 
 class SignInLoadingState extends AuthState {}
@@ -28,7 +28,7 @@ class SignInSuccessState extends AuthState {
   SignInSuccessState({required this.user, required this.userData});
 }
 
-class SignInFailuerState extends AuthState {
+class SignInFailureState extends AuthState {
   final String errMessage;
-  SignInFailuerState({required this.errMessage});
+  SignInFailureState({required this.errMessage});
 }

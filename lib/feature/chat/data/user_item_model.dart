@@ -3,7 +3,6 @@ class UserItem {
   final String firstName;
   final String email;
   final String? photoUrl;
-  // إضافة حقل الصورة
 
   UserItem({
     required this.userId,

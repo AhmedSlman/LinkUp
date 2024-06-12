@@ -4,7 +4,8 @@ import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:linkup/feature/auth/data/user_model.dart';
+import 'package:flutter/foundation.dart';
+import 'package:linkup/feature/auth/data/models/user_model.dart';
 import 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
@@ -53,7 +54,7 @@ class AuthCubit extends Cubit<AuthState> {
     } on FirebaseAuthException catch (e) {
       _sigUpHandelException(e);
     } catch (e) {
-      emit(SignUpFailuerState(errMessage: e.toString()));
+      emit(SignUpFailureState(errMessage: e.toString()));
     }
   }
 
@@ -69,7 +70,7 @@ class AuthCubit extends Cubit<AuthState> {
     } on FirebaseAuthException catch (e) {
       _sigInHandelException(e);
     } catch (e) {
-      emit(SignInFailuerState(errMessage: e.toString()));
+      emit(SignInFailureState(errMessage: e.toString()));
     }
   }
 
@@ -81,25 +82,25 @@ class AuthCubit extends Cubit<AuthState> {
   void _sigUpHandelException(FirebaseAuthException e) {
     if (e.code == 'weak-password') {
       emit(
-          SignUpFailuerState(errMessage: 'The password provided is too weak.'));
+          SignUpFailureState(errMessage: 'The password provided is too weak.'));
     } else if (e.code == 'email-already-in-use') {
-      emit(SignUpFailuerState(
+      emit(SignUpFailureState(
           errMessage: 'The account already exists for that email.'));
     } else if (e.code == 'invalid-email') {
-      emit(SignUpFailuerState(errMessage: 'The email is invalid.'));
+      emit(SignUpFailureState(errMessage: 'The email is invalid.'));
     } else {
-      emit(SignUpFailuerState(errMessage: e.code));
+      emit(SignUpFailureState(errMessage: e.code));
     }
   }
 
   void _sigInHandelException(FirebaseAuthException e) {
     if (e.code == 'user-not-found') {
-      emit(SignInFailuerState(errMessage: "No user found for that email."));
+      emit(SignInFailureState(errMessage: "No user found for that email."));
     } else if (e.code == 'wrong-password') {
-      emit(SignInFailuerState(
+      emit(SignInFailureState(
           errMessage: 'Wrong password provided for that user.'));
     } else {
-      emit(SignInFailuerState(errMessage: "Check your email and password."));
+      emit(SignInFailureState(errMessage: "Check your email and password."));
     }
   }
 
@@ -116,25 +117,23 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> uploadProfilePicture(String userId, File imageFile) async {
     try {
-      // رفع الصورة إلى Firebase Storage
       final ref =
           _storage.ref().child('user_profile_pictures').child('$userId.jpg');
       await ref.putFile(imageFile);
 
-      // الحصول على رابط الصورة
       final photoURL = await ref.getDownloadURL();
 
-      // تحديث رابط الصورة في Firestore
       await _firestore
           .collection('users')
           .doc(userId)
           .update({'photo_url': photoURL});
 
-      // تحديث الحالة لتشمل رابط الصورة الجديد
       final userData = await _loadUserData(userId);
       emit(SignInSuccessState(user: _auth.currentUser!, userData: userData));
     } catch (e) {
-      print('Error uploading profile picture: $e');
+      if (kDebugMode) {
+        print('Error uploading profile picture: $e');
+      }
     }
   }
 }

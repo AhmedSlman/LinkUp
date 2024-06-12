@@ -28,7 +28,7 @@ class _LoginPageState extends State<LoginPage> {
         listener: (context, state) {
           if (state is SignInSuccessState) {
             context.go(Routers.navigationBottom);
-          } else if (state is SignInFailuerState) {
+          } else if (state is SignInFailureState) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.errMessage)),
             );

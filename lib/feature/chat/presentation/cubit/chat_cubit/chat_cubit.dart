@@ -103,7 +103,7 @@ class ChatCubit extends Cubit<ChatState> {
       GoRouter.of(navigatorKey.currentContext!).go(
         '${Routers.conversation}/$chatId',
         extra: AllUsersModel(
-          chatId: chatId!,
+          chatId: chatId,
           otherUserId: userId,
           otherUserName: userName,
           latestMessage: '',

@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:linkup/core/utils/app_colors.dart';
-import 'package:linkup/feature/auth/data/user_model.dart';
+import 'package:linkup/feature/auth/data/models/user_model.dart';
 import 'package:linkup/feature/auth/presentation/cubit/auth_cubit.dart';
 import 'package:linkup/feature/chat/presentation/cubit/chatList_cubit/chat_list_cubit.dart';
 import 'package:linkup/feature/chat/presentation/cubit/chat_cubit/chat_cubit.dart';
